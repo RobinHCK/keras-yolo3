@@ -42,8 +42,8 @@ Here is the hierarchy that is expected by the workflow to work properly:
 
 ### 1. Dataset
 
-Perform data augmentation:
-* python FromARGDDatasetToAugmentedARGDDataset.py --config config.cfg
+- Perform data augmentation:
+  - python FromARGDDatasetToAugmentedARGDDataset.py --config config.cfg
 
 
 ### 2. Train
@@ -60,21 +60,23 @@ Perform data augmentation:
 
 ### 3. Test
 
-Create a file fill with detections performed by the network:
-* python test.py
-Compute and write metrics in datas.xlsx:
-* python ComputeMetricsOnTest.py --config config.cfg
-Draw detections on WSI with the best F1Score per scale:
-* python DrawBestWSI.py --config config.cfg
+- Create a file fill with detections performed by the network:
+  - python test.py
+- Compute and write metrics in datas.xlsx:
+  - python ComputeMetricsOnTest.py --config config.cfg
+- Draw detections on WSI with the best F1Score per scale:
+  - python DrawBestWSI.py --config config.cfg
 ![Neph](https://github.com/RobinHCK/keras-yolo3/blob/master/img/nephrectomy_with_detections.png)
-Draw graphics thanks to datas.xlsx:
-* python DrawGraphics.py
+
+- Draw graphics thanks to datas.xlsx:
+  - python DrawGraphics.py
+
 *Do not forget to test the right model, see the configuration file to know the model location*
 
 
 ### 4. Perform Detections On Video
 
-* python yolo_video.py --input video/your_video.mp4 --output video/your_video_with_detections.mp4 --model model_data/yolo.h5
+- python yolo_video.py --input video/your_video.mp4 --output video/your_video_with_detections.mp4 --model model_data/yolo.h5
 ![Video](https://github.com/RobinHCK/keras-yolo3/blob/master/img/biopsy_with_detections.jpg)
 *Do not forget to test the right model, see the configuration file to know the model location*
 
@@ -88,5 +90,5 @@ Robin Heckenauer - robin.heckenauer@gmail.com
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 
-* ERACoSysMed project "SysMIFTA", co-funded by EU H2020 and the national funding agencies German Ministry of Education and Research (BMBF) project management PTJ (FKZ: 031L-0085A), and Agence National de la Recherche (ANR), project number ANR-15-CMED-0004.
-* The High Performance Computing center of the University of Strasbourg. The computing resources were funded by the Equipex Equip@Meso project (Programme Investissements d'Avenir) and the CPER Alsacalcul/Big Data.
+- ERACoSysMed project "SysMIFTA", co-funded by EU H2020 and the national funding agencies German Ministry of Education and Research (BMBF) project management PTJ (FKZ: 031L-0085A), and Agence National de la Recherche (ANR), project number ANR-15-CMED-0004.
+- The High Performance Computing center of the University of Strasbourg. The computing resources were funded by the Equipex Equip@Meso project (Programme Investissements d'Avenir) and the CPER Alsacalcul/Big Data.
