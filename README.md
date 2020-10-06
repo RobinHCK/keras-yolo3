@@ -21,7 +21,7 @@
 <!-- PRESENTATION OF THE PROJECT -->
 ## Presentation Of The Project
 
-This research is carried out as part of the project Sys-MIFTA has been been published in the conference [IEEE 33rd International Symposium on
+This research is carried out as part of the project Sys-MIFTA and has been been published in the conference [IEEE 33rd International Symposium on
 Computer Based Medical Systems (CBMS)](http://cbms2020.org/). 
 The paper is available [here](https://ieeexplore.ieee.org/abstract/document/9183014).
 This work is a deep learning project applied to medical images. 
@@ -50,6 +50,7 @@ Perform data augmentation:
 
 Download the model pretrained on COCO dataset:
 * wget https://pjreddie.com/media/files/yolov3.weights
+<br/>
 Convert the weights for Keras:
 * python convert.py yolo3/yolov3.cfg yolov3.weights model_data/yolo.h5
 Train the network:
