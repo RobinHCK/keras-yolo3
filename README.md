@@ -53,8 +53,10 @@ Download the model pretrained on COCO dataset:
 <br/>
 Convert the weights for Keras:
 * python convert.py yolo3/yolov3.cfg yolov3.weights model_data/yolo.h5
+<br/>
 Train the network:
 * python train.py 
+<br/>
 *See the configuration file to know the model location*
 
 
