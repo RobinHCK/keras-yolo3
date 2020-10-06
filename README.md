@@ -48,15 +48,13 @@ Perform data augmentation:
 
 ### 2. Train
 
-Download the model pretrained on COCO dataset:
-* wget https://pjreddie.com/media/files/yolov3.weights
-<br/>
-Convert the weights for Keras:
-* python convert.py yolo3/yolov3.cfg yolov3.weights model_data/yolo.h5
-<br/>
-Train the network:
-* python train.py 
-<br/>
+- Download the model pretrained on COCO dataset:
+  - wget https://pjreddie.com/media/files/yolov3.weights
+- Convert the weights for Keras:
+  - python convert.py yolo3/yolov3.cfg yolov3.weights model_data/yolo.h5
+- Train the network:
+  - python train.py 
+
 *See the configuration file to know the model location*
 
 
