@@ -31,8 +31,8 @@ The dataset contains WSI of stained H&E renal nephrectomies that are used by the
 <!-- GETTING STARTED -->
 ## Prerequisite
 
-* Before executing the sctipts, make sure you have correctly entered the configuration file: **config.cfg**
-* The medical images used for this project are private data that we cannot share.
+- Before executing the sctipts, make sure you have correctly entered the configuration file: **config.cfg**
+- The medical images used for this project are private data that we cannot share.
 You will need to use your own data. 
 Here is the hierarchy that is expected by the workflow to work properly:
 ![Hierarchy](https://github.com/RobinHCK/keras-yolo3/blob/master/img/ARGD_dataset_hierarchy.png)
@@ -67,7 +67,6 @@ Here is the hierarchy that is expected by the workflow to work properly:
 - Draw detections on WSI with the best F1Score per scale:
   - python DrawBestWSI.py --config config.cfg
 ![Neph](https://github.com/RobinHCK/keras-yolo3/blob/master/img/nephrectomy_with_detections.png)
-
 - Draw graphics thanks to datas.xlsx:
   - python DrawGraphics.py
 
