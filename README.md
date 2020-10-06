@@ -35,7 +35,7 @@ The dataset contains WSI of stained H&E renal nephrectomies that are used by the
 * The medical images used for this project are private data that we cannot share.
 You will need to use your own data. 
 Here is the hierarchy that is expected by the workflow to work properly:
-![Hierarchy](https://github.com/RobinHCK/ARGDv2/tree/master/img/)
+![Hierarchy](https://github.com/RobinHCK/keras-yolo3/blob/master/img/ARGD_dataset_hierarchy.png)
 
 <!-- WORKFLOW -->
 ## Workflow
@@ -50,13 +50,10 @@ Perform data augmentation:
 
 Download the model pretrained on COCO dataset:
 * wget https://pjreddie.com/media/files/yolov3.weights
-<br>
 Convert the weights for Keras:
 * python convert.py yolo3/yolov3.cfg yolov3.weights model_data/yolo.h5
-<br>
 Train the network:
 * python train.py 
-<br>
 *See the configuration file to know the model location*
 
 
@@ -64,23 +61,20 @@ Train the network:
 
 Create a file fill with detections performed by the network:
 * python test.py
-<br>
 Compute and write metrics in datas.xlsx:
 * python ComputeMetricsOnTest.py --config config.cfg
-<br>
 Draw detections on WSI with the best F1Score per scale:
 * python DrawBestWSI.py --config config.cfg
-<br>
+![Neph](https://github.com/RobinHCK/keras-yolo3/blob/master/img/nephrectomy_with_detections.png)
 Draw graphics thanks to datas.xlsx:
 * python DrawGraphics.py
-<br>
 *Do not forget to test the right model, see the configuration file to know the model location*
 
 
 ### 4. Perform Detections On Video
 
 * python yolo_video.py --input video/your_video.mp4 --output video/your_video_with_detections.mp4 --model model_data/yolo.h5
-<br>
+![Video](https://github.com/RobinHCK/keras-yolo3/blob/master/img/biopsy_with_detections.jpg)
 *Do not forget to test the right model, see the configuration file to know the model location*
 
 
