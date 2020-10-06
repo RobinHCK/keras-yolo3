@@ -1,99 +1,97 @@
-# keras-yolo3
+<!-- TITLE -->
+<br />
+<p align="center">
+  <h3 align="center">Real-time detection for renal pathology</h3>
+</p>
 
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
+<!-- TABLE OF CONTENTS -->
+## Table of Contents
 
-## Introduction
+* [Presentation of the Project](#presentation-of-the-project)
+* [Prerequisite](#prerequisite)
+* [Workflow](#workflow)
+  * [Dataset](#dataset)
+  * [Train](#train)
+  * [Test](#test)
+  * [Perform detections on video](#perform-detections-on-video)
+* [Contact](#contact)
+* [Acknowledgements](#acknowledgements)
 
-A Keras implementation of YOLOv3 (Tensorflow backend) inspired by [allanzelener/YAD2K](https://github.com/allanzelener/YAD2K).
+
+<!-- PRESENTATION OF THE PROJECT -->
+## Presentation Of The Project
+
+This research is carried out as part of the project Sys-MIFTA has been been published in the conference [IEEE 33rd International Symposium on
+Computer Based Medical Systems (CBMS)](http://cbms2020.org/). 
+The paper is available [here](https://ieeexplore.ieee.org/abstract/document/9183014).
+This work is a deep learning project applied to medical images. 
+The dataset contains WSI of stained H&E renal nephrectomies that are used by the YOLOv3 network to create a model capable of detecting glomeruli in real-time.
 
 
----
+<!-- GETTING STARTED -->
+## Prerequisite
 
-## Quick Start
+* Before executing the sctipts, make sure you have correctly entered the configuration file: **config.cfg**
+* The medical images used for this project are private data that we cannot share.
+You will need to use your own data. 
+Here is the hierarchy that is expected by the workflow to work properly:
+![Hierarchy](https://github.com/RobinHCK/ARGDv2/tree/master/img/)
 
-1. Download YOLOv3 weights from [YOLO website](http://pjreddie.com/darknet/yolo/).
-2. Convert the Darknet YOLO model to a Keras model.
-3. Run YOLO detection.
+<!-- WORKFLOW -->
+## Workflow
 
-```
-wget https://pjreddie.com/media/files/yolov3.weights
-python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
-python yolo_video.py [OPTIONS...] --image, for image detection mode, OR
-python yolo_video.py [video_path] [output_path (optional)]
-```
+### 1. Dataset
 
-For Tiny YOLOv3, just do in a similar way, just specify model path and anchor path with `--model model_file` and `--anchors anchor_file`.
+Perform data augmentation:
+* python FromARGDDatasetToAugmentedARGDDataset.py --config config.cfg
 
-### Usage
-Use --help to see usage of yolo_video.py:
-```
-usage: yolo_video.py [-h] [--model MODEL] [--anchors ANCHORS]
-                     [--classes CLASSES] [--gpu_num GPU_NUM] [--image]
-                     [--input] [--output]
 
-positional arguments:
-  --input        Video input path
-  --output       Video output path
+### 2. Train
 
-optional arguments:
-  -h, --help         show this help message and exit
-  --model MODEL      path to model weight file, default model_data/yolo.h5
-  --anchors ANCHORS  path to anchor definitions, default
-                     model_data/yolo_anchors.txt
-  --classes CLASSES  path to class definitions, default
-                     model_data/coco_classes.txt
-  --gpu_num GPU_NUM  Number of GPU to use, default 1
-  --image            Image detection mode, will ignore all positional arguments
-```
----
+Download the model pretrained on COCO dataset:
+* wget https://pjreddie.com/media/files/yolov3.weights
+<br>
+Convert the weights for Keras:
+* python convert.py yolo3/yolov3.cfg yolov3.weights model_data/yolo.h5
+<br>
+Train the network:
+* python train.py 
+<br>
+*See the configuration file to know the model location*
 
-4. MultiGPU usage: use `--gpu_num N` to use N GPUs. It is passed to the [Keras multi_gpu_model()](https://keras.io/utils/#multi_gpu_model).
 
-## Training
+### 3. Test
 
-1. Generate your own annotation file and class names file.  
-    One row for one image;  
-    Row format: `image_file_path box1 box2 ... boxN`;  
-    Box format: `x_min,y_min,x_max,y_max,class_id` (no space).  
-    For VOC dataset, try `python voc_annotation.py`  
-    Here is an example:
-    ```
-    path/to/img1.jpg 50,100,150,200,0 30,50,200,120,3
-    path/to/img2.jpg 120,300,250,600,2
-    ...
-    ```
+Create a file fill with detections performed by the network:
+* python test.py
+<br>
+Compute and write metrics in datas.xlsx:
+* python ComputeMetricsOnTest.py --config config.cfg
+<br>
+Draw detections on WSI with the best F1Score per scale:
+* python DrawBestWSI.py --config config.cfg
+<br>
+Draw graphics thanks to datas.xlsx:
+* python DrawGraphics.py
+<br>
+*Do not forget to test the right model, see the configuration file to know the model location*
 
-2. Make sure you have run `python convert.py -w yolov3.cfg yolov3.weights model_data/yolo_weights.h5`  
-    The file model_data/yolo_weights.h5 is used to load pretrained weights.
 
-3. Modify train.py and start training.  
-    `python train.py`  
-    Use your trained weights or checkpoint weights with command line option `--model model_file` when using yolo_video.py
-    Remember to modify class path or anchor path, with `--classes class_file` and `--anchors anchor_file`.
+### 4. Perform Detections On Video
 
-If you want to use original pretrained weights for YOLOv3:  
-    1. `wget https://pjreddie.com/media/files/darknet53.conv.74`  
-    2. rename it as darknet53.weights  
-    3. `python convert.py -w darknet53.cfg darknet53.weights model_data/darknet53_weights.h5`  
-    4. use model_data/darknet53_weights.h5 in train.py
+* python yolo_video.py --input video/your_video.mp4 --output video/your_video_with_detections.mp4 --model model_data/yolo.h5
+<br>
+*Do not forget to test the right model, see the configuration file to know the model location*
 
----
 
-## Some issues to know
+<!-- CONTACT -->
+## Contact
 
-1. The test environment is
-    - Python 3.5.2
-    - Keras 2.1.5
-    - tensorflow 1.6.0
+Robin Heckenauer - robin.heckenauer@gmail.com
 
-2. Default anchors are used. If you use your own anchors, probably some changes are needed.
 
-3. The inference result is not totally the same as Darknet but the difference is small.
+<!-- ACKNOWLEDGEMENTS -->
+## Acknowledgements
 
-4. The speed is slower than Darknet. Replacing PIL with opencv may help a little.
-
-5. Always load pretrained weights and freeze layers in the first stage of training. Or try Darknet training. It's OK if there is a mismatch warning.
-
-6. The training strategy is for reference only. Adjust it according to your dataset and your goal. And add further strategy if needed.
-
-7. For speeding up the training process with frozen layers train_bottleneck.py can be used. It will compute the bottleneck features of the frozen model first and then only trains the last layers. This makes training on CPU possible in a reasonable time. See [this](https://blog.keras.io/building-powerful-image-classification-models-using-very-little-data.html) for more information on bottleneck features.
+* ERACoSysMed project "SysMIFTA", co-funded by EU H2020 and the national funding agencies German Ministry of Education and Research (BMBF) project management PTJ (FKZ: 031L-0085A), and Agence National de la Recherche (ANR), project number ANR-15-CMED-0004.
+* The High Performance Computing center of the University of Strasbourg. The computing resources were funded by the Equipex Equip@Meso project (Programme Investissements d'Avenir) and the CPER Alsacalcul/Big Data.

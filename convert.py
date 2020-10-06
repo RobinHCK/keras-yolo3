@@ -21,7 +21,7 @@ from keras.regularizers import l2
 from keras.utils.vis_utils import plot_model as plot
 
 
-parser = argparse.ArgumentParser(description='Darknet To Keras Converter.')
+parser = argparse.ArgumentParser(description='step 2 : Darknet To Keras Converter.')
 parser.add_argument('config_path', help='Path to Darknet cfg file.')
 parser.add_argument('weights_path', help='Path to Darknet weights file.')
 parser.add_argument('output_path', help='Path to output Keras model file.')

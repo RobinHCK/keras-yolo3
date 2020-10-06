@@ -3,7 +3,6 @@
 Class definition of YOLO_v3 style detection model on image and video
 """
 
-import colorsys
 import os
 from timeit import default_timer as timer
 
@@ -15,17 +14,16 @@ from PIL import Image, ImageFont, ImageDraw
 
 from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body
 from yolo3.utils import letterbox_image
-import os
 from keras.utils import multi_gpu_model
 
 class YOLO(object):
     _defaults = {
         "model_path": 'model_data/yolo.h5',
         "anchors_path": 'model_data/yolo_anchors.txt',
-        "classes_path": 'model_data/coco_classes.txt',
-        "score" : 0.3,
-        "iou" : 0.45,
-        "model_image_size" : (416, 416),
+        "classes_path": 'model_data/class.txt',
+        "score" : 0.0001,
+        "iou" : 0.0001,
+        "model_image_size" : (1280, 736),
         "gpu_num" : 1,
     }
 
@@ -77,18 +75,6 @@ class YOLO(object):
                 num_anchors/len(self.yolo_model.output) * (num_classes + 5), \
                 'Mismatch between model and given anchor and class sizes'
 
-        print('{} model, anchors, and classes loaded.'.format(model_path))
-
-        # Generate colors for drawing bounding boxes.
-        hsv_tuples = [(x / len(self.class_names), 1., 1.)
-                      for x in range(len(self.class_names))]
-        self.colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
-        self.colors = list(
-            map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)),
-                self.colors))
-        np.random.seed(10101)  # Fixed seed for consistent colors across runs.
-        np.random.shuffle(self.colors)  # Shuffle colors to decorrelate adjacent classes.
-        np.random.seed(None)  # Reset seed to default.
 
         # Generate output tensor targets for filtered bounding boxes.
         self.input_image_shape = K.placeholder(shape=(2, ))
@@ -152,19 +138,67 @@ class YOLO(object):
                 text_origin = np.array([left, top + 1])
 
             # My kingdom for a good redistributable image drawing library.
+
             for i in range(thickness):
+                scoreColor = (0,0,0)
+                if score < 0.5:
+                    scoreColor=(0,int(score*255*2),255)
+                if score >= 0.5:
+                    scoreColor=(0,255,int((1-((score-0.5)*2))*255))
                 draw.rectangle(
                     [left + i, top + i, right - i, bottom - i],
-                    outline=self.colors[c])
+                    outline=scoreColor)
             draw.rectangle(
                 [tuple(text_origin), tuple(text_origin + label_size)],
-                fill=self.colors[c])
-            draw.text(text_origin, label, fill=(0, 0, 0), font=font)
+                fill=scoreColor)
+            draw.text(text_origin, label, fill=(255,255,255), font=font)
             del draw
 
         end = timer()
         print(end - start)
         return image
+    
+    def detect_image_return_box(self, image):
+
+        if self.model_image_size != (None, None):
+            assert self.model_image_size[0]%32 == 0, 'Multiples of 32 required'
+            assert self.model_image_size[1]%32 == 0, 'Multiples of 32 required'
+            boxed_image = letterbox_image(image, tuple(reversed(self.model_image_size)))
+        else:
+            new_image_size = (image.width - (image.width % 32),
+                              image.height - (image.height % 32))
+            boxed_image = letterbox_image(image, new_image_size)
+        image_data = np.array(boxed_image, dtype='float32')
+
+        image_data /= 255.
+        image_data = np.expand_dims(image_data, 0)  # Add batch dimension.
+
+        out_boxes, out_scores, out_classes = self.sess.run(
+            [self.boxes, self.scores, self.classes],
+            feed_dict={
+                self.yolo_model.input: image_data,
+                self.input_image_shape: [image.size[1], image.size[0]],
+                K.learning_phase(): 0
+            })
+        
+        boxes = []
+
+        for i, c in reversed(list(enumerate(out_classes))):
+            predicted_class = self.class_names[c]
+            box = out_boxes[i]
+            score = out_scores[i]
+
+            label = '{} {:.2f}'.format(predicted_class, score)
+
+            top, left, bottom, right = box
+            top = max(0, np.floor(top + 0.5).astype('int32'))
+            left = max(0, np.floor(left + 0.5).astype('int32'))
+            bottom = min(image.size[1], np.floor(bottom + 0.5).astype('int32'))
+            right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
+            
+            boxes.append([label, left, top, right, bottom])
+            
+        return boxes
 
     def close_session(self):
         self.sess.close()
@@ -174,7 +208,7 @@ def detect_video(yolo, video_path, output_path=""):
     vid = cv2.VideoCapture(video_path)
     if not vid.isOpened():
         raise IOError("Couldn't open webcam or video")
-    video_FourCC    = int(vid.get(cv2.CAP_PROP_FOURCC))
+    video_FourCC    = cv2.VideoWriter_fourcc(*"mp4v")
     video_fps       = vid.get(cv2.CAP_PROP_FPS)
     video_size      = (int(vid.get(cv2.CAP_PROP_FRAME_WIDTH)),
                         int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
@@ -188,6 +222,8 @@ def detect_video(yolo, video_path, output_path=""):
     prev_time = timer()
     while True:
         return_value, frame = vid.read()
+        if not return_value :
+            break
         image = Image.fromarray(frame)
         image = yolo.detect_image(image)
         result = np.asarray(image)
@@ -202,11 +238,26 @@ def detect_video(yolo, video_path, output_path=""):
             curr_fps = 0
         cv2.putText(result, text=fps, org=(3, 15), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.50, color=(255, 0, 0), thickness=2)
-        cv2.namedWindow("result", cv2.WINDOW_NORMAL)
-        cv2.imshow("result", result)
         if isOutput:
             out.write(result)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     yolo.close_session()
+
+def detect_video_return_box(yolo, video_path, output_path=""):
+    import cv2
+    vid = cv2.VideoCapture(video_path)
+    
+    if not vid.isOpened():
+        raise IOError("Couldn't open webcam or video")
+            
+    while True:
+        return_value, frame = vid.read()
+        if not return_value :
+            break
+        image = Image.fromarray(frame)
+        print(video_path, yolo.detect_image_return_box(image))
+        
+    yolo.close_session()
+
 
