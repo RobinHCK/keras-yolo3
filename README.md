@@ -23,7 +23,7 @@
 
 This research is carried out as part of the project Sys-MIFTA and has been been published in the conference [IEEE 33rd International Symposium on
 Computer Based Medical Systems (CBMS)](http://cbms2020.org/). 
-The paper is available [here](https://ieeexplore.ieee.org/abstract/document/9183014).
+The paper is available [here](https://germain-forestier.info/publis/cbms2020.pdf).
 This work is a deep learning project applied to medical images. 
 The dataset contains WSI of stained H&E renal nephrectomies that are used by the YOLOv3 network to create a model capable of detecting glomeruli in real-time.
 
