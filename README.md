@@ -43,7 +43,7 @@ Here is the hierarchy that is expected by the workflow to work properly:
 ### 1. Dataset
 
 - Perform data augmentation:
-  - python FromARGDDatasetToAugmentedARGDDataset.py --config config.cfg
+  - python 1_augmentDataset.py --config config.cfg
 
 
 ### 2. Train
@@ -51,9 +51,9 @@ Here is the hierarchy that is expected by the workflow to work properly:
 - Download the model pretrained on COCO dataset:
   - wget https://pjreddie.com/media/files/yolov3.weights
 - Convert the weights for Keras:
-  - python convert.py yolo3/yolov3.cfg yolov3.weights model_data/yolo.h5
+  - python 2a_convertWeights.py yolo3/yolov3.cfg yolov3.weights model_data/yolo.h5
 - Train the network:
-  - python train.py 
+  - python 2b_train.py 
 
 *See the configuration file to know the model location*
 
@@ -61,21 +61,21 @@ Here is the hierarchy that is expected by the workflow to work properly:
 ### 3. Test
 
 - Create a file fill with detections performed by the network:
-  - python test.py
+  - python 3a_test.py
 - Compute and write metrics in datas.xlsx:
-  - python ComputeMetricsOnTest.py --config config.cfg
+  - python 3b_computeMetricsOnTest.py --config config.cfg
 - Draw detections on WSI with the best F1Score per scale:
-  - python DrawBestWSI.py --config config.cfg
+  - python 3c_drawBestWSI.py --config config.cfg
 ![Neph](https://github.com/RobinHCK/keras-yolo3/blob/master/img/nephrectomy_with_detections.png)
 - Draw graphics thanks to datas.xlsx:
-  - python DrawGraphics.py
+  - python 3d_drawGraphics.py
 
 *Do not forget to test the right model, see the configuration file to know the model location*
 
 
 ### 4. Perform Detections On Video
 
-- python yolo_video.py --input video/your_video.mp4 --output video/your_video_with_detections.mp4 --model model_data/yolo.h5
+- python 4_yolo_video.py --input video/your_video.mp4 --output video/your_video_with_detections.mp4 --model model_data/yolo.h5
 ![Video](https://github.com/RobinHCK/keras-yolo3/blob/master/img/biopsy_with_detections.jpg)
 *Do not forget to test the right model, see the configuration file to know the model location*
 

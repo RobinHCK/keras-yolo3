@@ -214,7 +214,7 @@ def data_augmentation_rotate(path_dataset_created, augmented_dataset_name, datas
 if __name__ == "__main__":
     
     # Create the file arguments
-    parser = argparse.ArgumentParser(description='Perform a data augmentation on ARGD dataset.')
+    parser = argparse.ArgumentParser(description='Perform data augmentation on dataset patches.')
     parser.add_argument('-c', '--config', type=str, help='The configuration file to use')
     args = parser.parse_args()
     
